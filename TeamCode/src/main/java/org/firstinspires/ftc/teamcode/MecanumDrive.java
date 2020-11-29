@@ -12,6 +12,8 @@ public class MecanumDrive extends OpMode
     private DcMotor rightFrontMotor;
     private DcMotor leftRearMotor;
     private DcMotor rightRearMotor;
+    private DcMotor launcherMotor;
+    private boolean isLauncherOn;
 
     @Override
     public void init() {
@@ -24,6 +26,7 @@ public class MecanumDrive extends OpMode
         rightFrontMotor = hardwareMap.get(DcMotor.class, "Right Front");
         leftRearMotor = hardwareMap.get(DcMotor.class, "Left Rear");
         rightRearMotor = hardwareMap.get(DcMotor.class, "Right Rear");
+        launcherMotor = hardwareMap.get(DcMotor.class, "Shooter");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
@@ -46,6 +49,14 @@ public class MecanumDrive extends OpMode
         double ly = gamepad1.left_stick_y;
         double lx = gamepad1.left_stick_x;
         double rx = gamepad1.right_stick_x;
+        if ((gamepad1.right_trigger !=0) && !isLauncherOn){
+            isLauncherOn = true;
+            launcherMotor.setPower(1);
+        }
+        if (gamepad1.right_bumper && isLauncherOn) {
+            isLauncherOn = false;
+            launcherMotor.setPower(0);
+        }
 
         // Compute the commands to each of the four motors from the joystick values.
         double leftFrontMotorCommand = ly + lx - rx;
