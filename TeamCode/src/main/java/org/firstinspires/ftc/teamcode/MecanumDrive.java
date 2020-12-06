@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(name="MecanumDrive", group="Iterative Opmode")
 //@Disabled
@@ -14,6 +15,7 @@ public class MecanumDrive extends OpMode
     private DcMotor rightRearMotor;
     private DcMotor launcherMotor;
     private boolean isLauncherOn;
+    private Servo launcherServo;
 
     @Override
     public void init() {
@@ -27,6 +29,7 @@ public class MecanumDrive extends OpMode
         leftRearMotor = hardwareMap.get(DcMotor.class, "Left Rear");
         rightRearMotor = hardwareMap.get(DcMotor.class, "Right Rear");
         launcherMotor = hardwareMap.get(DcMotor.class, "Shooter");
+        launcherServo = hardwareMap.get(Servo.class, "launcher servo");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
@@ -57,6 +60,10 @@ public class MecanumDrive extends OpMode
             isLauncherOn = false;
             launcherMotor.setPower(0);
         }
+        if (gamepad1.left_trigger!=0)
+            launcherServo.setPosition(-1);
+        else
+            launcherServo.setPosition(1);
 
         // Compute the commands to each of the four motors from the joystick values.
         double leftFrontMotorCommand = ly + lx - rx;
