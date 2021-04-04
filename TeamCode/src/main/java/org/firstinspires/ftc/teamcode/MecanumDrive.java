@@ -14,8 +14,11 @@ public class MecanumDrive extends OpMode
     private DcMotor leftRearMotor;
     private DcMotor rightRearMotor;
     private DcMotor launcherMotor;
+    private DcMotor feederMotor;
     private boolean isLauncherOn;
+    private boolean isFeederOn;
     private Servo launcherServo;
+    private boolean isLauncherServoActive;
 
     @Override
     public void init() {
@@ -29,6 +32,7 @@ public class MecanumDrive extends OpMode
         leftRearMotor = hardwareMap.get(DcMotor.class, "Left Rear");
         rightRearMotor = hardwareMap.get(DcMotor.class, "Right Rear");
         launcherMotor = hardwareMap.get(DcMotor.class, "Shooter");
+        feederMotor = hardwareMap.get(DcMotor.class, "Feeder");
         launcherServo = hardwareMap.get(Servo.class, "launcher servo");
 
         // Most robots need the motor on one side to be reversed to drive forward
@@ -37,6 +41,7 @@ public class MecanumDrive extends OpMode
         leftRearMotor.setDirection(DcMotor.Direction.FORWARD);
         rightFrontMotor.setDirection(DcMotor.Direction.REVERSE);
         rightRearMotor.setDirection(DcMotor.Direction.REVERSE);
+        launcherMotor.setDirection(DcMotor.Direction.REVERSE);
 
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
@@ -52,18 +57,27 @@ public class MecanumDrive extends OpMode
         double ly = gamepad1.left_stick_y;
         double lx = gamepad1.left_stick_x;
         double rx = gamepad1.right_stick_x;
-        if ((gamepad1.right_trigger !=0) && !isLauncherOn){
+        if ((gamepad2.right_trigger !=0) && !isLauncherOn){
             isLauncherOn = true;
             launcherMotor.setPower(1);
         }
-        if (gamepad1.right_bumper && isLauncherOn) {
+        if (gamepad2.right_bumper && isLauncherOn) {
             isLauncherOn = false;
             launcherMotor.setPower(0);
         }
-        if (gamepad1.left_trigger!=0)
-            launcherServo.setPosition(-1);
-        else
-            launcherServo.setPosition(1);
+        if ((gamepad2.left_trigger !=0) && !isFeederOn){
+            isFeederOn = true;
+            feederMotor.setPower(1);
+        }
+        if (gamepad2.left_bumper && isFeederOn) {
+            isFeederOn = false;
+            feederMotor.setPower(0);
+        }
+        if (gamepad2.y ^ isLauncherServoActive)
+        {
+            isLauncherServoActive = !isLauncherServoActive;
+            launcherServo.setPosition(isLauncherServoActive ? 0.75 : 0);
+        }
 
         // Compute the commands to each of the four motors from the joystick values.
         double leftFrontMotorCommand = ly + lx - rx;
